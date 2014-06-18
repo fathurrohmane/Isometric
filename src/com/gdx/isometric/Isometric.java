@@ -18,6 +18,10 @@ public class Isometric {
 	private int sizeMapX, sizeMapY;
 	private Tile[][] tiles;
 	private Object[][][] objects;
+	
+	public Vector2 position;
+	public float width;
+	public float height;
 
 	// Create new Isometric | Input tile isometic and map
 	public Isometric(FileHandle tileFile, FileHandle dataMapFile, int sizeMapX,
@@ -27,6 +31,9 @@ public class Isometric {
 		atlasTiles = new TextureAtlas(tileFile);
 		readDataTiles(dataMapFile);
 		createTiles();
+		position = new Vector2(0, 0);
+		setWidth();
+		setHeight();
 	}
 
 	private void readDataTiles(FileHandle dataTileFile) {
@@ -91,26 +98,26 @@ public class Isometric {
 		}
 	}
 	//need to edit
-//	public Vector2 isoTo2D(float x, float y) {
-//		Vector2 tempPos = new Vector2(0, 0);
-//		tempPos.x = (2 * y + x) / 2;
-//		tempPos.y = (2 * y - x) / 2;
-//		return tempPos;
-//	}
+	public Vector2 isoTo2D(int x, int y) {
+		Vector2 tempPos = new Vector2(0, 0);
+		tempPos.x = (y / tiles[x][y].getHeight() / 2) - (x / tiles[x][y].getWidth() / 2);
+		tempPos.y = (y / tiles[x][y].getHeight() / 2) + (x / tiles[x][y].getWidth() / 2);
+		return tempPos;
+//		map.x = (screen.x / TILE_WIDTH_HALF + screen.y / TILE_HEIGHT_HALF) / 2;
+//		map.y = (screen.y / TILE_HEIGHT_HALF -(screen.x / TILE_WIDTH_HALF)) / 2;
+		
+	}
 
-//	public Vector2 twoDToIso(float x, float y) {
-//		Vector2 tempPos = new Vector2(0, 0);
-//		tempPos.x = (x + y) / 2;
-//		tempPos.y = (y - x) / 2;
-//		return tempPos;
-//	}
-	
-//	public Vector2 twoDToIso(float x, float y) {
-//		Vector2 tempPos = new Vector2(0, 0);
-//		tempPos.x = (x + y);
-//		tempPos.y = (y - x) / 2;
-//		return tempPos;
-//	}
+	public Vector2 twoDToIso(int x, int y) {
+		Vector2 tempPos = new Vector2(0, 0);
+		tempPos.x = (x + y) * tiles[x][y].getWidth() / 2;
+		tempPos.y = (y - x) * (tiles[x][y].getHeight() - 15) / 2;//NEED EDIT
+		return tempPos;
+//		Basic isometric map to screen is:
+//		screen.x = (map.x - map.y) * TILE_WIDTH_HALF;
+//		screen.y = (map.x + map.y) * TILE_HEIGHT_HALF;
+	}
+
 
 	public void draw(SpriteBatch batch) {
 		for (int x = 0; x < sizeMapX; x++) {
@@ -121,7 +128,6 @@ public class Isometric {
 						objects[x][y][q].draw(batch);
 					}
 				}
-				
 			}
 		}
 	}
@@ -190,8 +196,7 @@ public class Isometric {
 	
 	private void createObjects() {
 		objects = new Object[sizeMapX*2][sizeMapY*2][4];
-		int counterX = 0;
-		int counterY = 0;
+
 		//int quadran = 1;
 		for (int x = 0; x < sizeMapX; x++) {
 			for (int y = 0; y < sizeMapY; y++) {
@@ -222,6 +227,58 @@ public class Isometric {
 				
 			}
 		}
+	}
+	
+	public void setPosition(Vector2 position) {
+		for (int x = 0; x < sizeMapX; x++) {
+			for (int y = 0; y < sizeMapY; y++) {
+				tiles[x][y].setPosition(
+						position.x + (x + y) * tiles[x][y].getWidth() / 2,
+						position.y + (y - x) * (tiles[x][y].getHeight() - 15) / 2);//NEED EDIT
+				tiles[x][y].setTilePos(new Vector2(x, y));
+				for (int q = 0; q < 4; q++) {
+					if(objects[x][y][q] != null){
+						switch (q) {
+						case 0:
+							objects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() / 2, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.75f);
+							break;
+						case 1:
+							objects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() * 0.25f, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.5f);
+							break;
+						case 2:
+							objects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() / 2, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.25f);
+							break;
+						case 3:
+							objects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() * 0.75f,tiles[x][y].getY() + tiles[x][y].getHeight() / 2);
+							break;
+
+						default:
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public Vector2 getPosition() {
+		return position;
+	}
+	
+	public float getWidth() {
+		return width;
+	}
+	
+	public float getHeight() {
+		return height;
+	}
+	
+	private void setWidth() {
+		this.width = sizeMapX*tiles[0][0].getWidth() / 2;
+	}
+	
+	private void setHeight() {
+		this.height = sizeMapY*tiles[0][0].getHeight() / 2;
 	}
 }
 //http://clintbellanger.net/articles/isometric_math/

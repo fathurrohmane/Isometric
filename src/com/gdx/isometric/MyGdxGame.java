@@ -10,11 +10,15 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 
 public class MyGdxGame implements ApplicationListener {
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private Isometric isometric;
+	private Isometric isometric2;
+	private Vector2 pos;
+	private Vector2 pos2;
 	
 	@Override
 	public void create() {		
@@ -26,6 +30,10 @@ public class MyGdxGame implements ApplicationListener {
 		
 		isometric = new Isometric(Gdx.files.internal("tiles_2/tiles.pack"), Gdx.files.internal("tiles_2/map.txt"), 6, 5);
 		isometric.addObject(Gdx.files.internal("objects/trees.pack"), Gdx.files.internal("objects/map.txt"));
+		isometric2 = new Isometric(Gdx.files.internal("tiles_2/tiles.pack"), Gdx.files.internal("tiles_2/map.txt"), 6, 5);
+		isometric2.addObject(Gdx.files.internal("objects/trees.pack"), Gdx.files.internal("objects/map.txt"));
+		pos = new Vector2(0,0);
+		pos2 = new Vector2(isometric.getWidth(),isometric.getHeight());
 
 	}
 
@@ -52,8 +60,12 @@ public class MyGdxGame implements ApplicationListener {
 		camera.update();
 		
 		batch.setProjectionMatrix(camera.combined);
-		batch.begin();
+		batch.begin();		
 		isometric.draw(batch);
+		isometric2.draw(batch);
+
+		isometric.setPosition(pos);
+		isometric2.setPosition(pos2);
 		batch.end();
 		
 
