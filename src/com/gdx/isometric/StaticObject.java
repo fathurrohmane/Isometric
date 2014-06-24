@@ -5,12 +5,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
-public class Object extends Sprite {
+public class StaticObject extends Sprite {
 
 	private Vector2 tilePosOnMap;
 	private int quadran;
 	
-	public Object(TextureRegion textureRegion) {
+	public StaticObject(TextureRegion textureRegion) {
 		super(textureRegion);
 	}
 	

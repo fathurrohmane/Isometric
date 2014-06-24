@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
@@ -17,11 +19,13 @@ public class Isometric {
 	private String[][][] dataObjects;
 	private int sizeMapX, sizeMapY;
 	private Tile[][] tiles;
-	private Object[][][] objects;
+	private StaticObject[][][] objects;
 	
 	public Vector2 position;
 	public float width;
 	public float height;
+	
+	private DynamicObject dynamicObject;
 
 	// Create new Isometric | Input tile isometic and map
 	public Isometric(FileHandle tileFile, FileHandle dataMapFile, int sizeMapX,
@@ -58,10 +62,10 @@ public class Isometric {
 			int counterY = 0;
 			for (int x = counterLines - 1; x >= 0; x--) {// loop for x axis
 				String line = lines[x];
-				System.out.println(line);
+				//System.out.println(line);
 				for (int y = 0; y < line.length(); y++) {// loop for y axis
 					if (y % 2 == 0 && counterX != sizeMapX) {
-						System.out.println(counterX + " " + counterY);
+						//System.out.println(counterX + " " + counterY);
 						dataTiles[counterX][counterY] = line.charAt(y) + ""
 								+ line.charAt(y + 1);
 						counterX++;
@@ -118,7 +122,6 @@ public class Isometric {
 //		screen.y = (map.x + map.y) * TILE_HEIGHT_HALF;
 	}
 
-
 	public void draw(SpriteBatch batch) {
 		for (int x = 0; x < sizeMapX; x++) {
 			for (int y = sizeMapY - 1; y >= 0; y--) {
@@ -128,11 +131,14 @@ public class Isometric {
 						objects[x][y][q].draw(batch);
 					}
 				}
+				if(dynamicObject != null){
+					dynamicObject.draw(batch);
+				}
 			}
 		}
 	}
 	
-	public void addObject(FileHandle objectFile, FileHandle dataMapFile){
+	public void addStaticObject(FileHandle objectFile, FileHandle dataMapFile){
 		atlasObjects = new TextureAtlas(objectFile);
 		readDataObject(dataMapFile);
 	}
@@ -157,7 +163,14 @@ public class Isometric {
 			// split map data line into x and y
 			int counterX = 0;
 			int counterY = 0;
-			int quadran = 1;
+			int quadran;
+			
+			if(counterLines % 2 == 0){
+				quadran = 1;
+			}else{
+				quadran = 0;
+			}
+			
 			for (int x = counterLines - 1; x >= 0; x--) {// loop for x axis
 				String line = lines[x];
 				//System.out.println(line);
@@ -165,15 +178,16 @@ public class Isometric {
 					if (y % 2 == 0 && counterX != sizeMapX*2) {
 						dataObjects[counterX][counterY][quadran] = line.charAt(y) + ""
 								+ line.charAt(y + 1);
+						System.out.println(line.charAt(y) + "" + line.charAt(y + 1));
 						if(quadran == 1){
-							quadran = 0;
-						}else if(quadran == 0){
+							quadran = 2;
+						}else if(quadran == 2){
 							quadran = 1;
 							counterX++;
-						}else if(quadran == 2){
+						}else if(quadran == 0){
 							quadran = 3;
 						}else if(quadran == 3){
-							quadran = 2;
+							quadran = 0;
 							counterX++;
 						}
 					}
@@ -182,7 +196,7 @@ public class Isometric {
 					quadran = 1;
 					counterY++;
 				}else{
-					quadran = 2;
+					quadran = 0;
 				}
 				counterX = 0;
 			}
@@ -195,14 +209,14 @@ public class Isometric {
 	}
 	
 	private void createObjects() {
-		objects = new Object[sizeMapX*2][sizeMapY*2][4];
+		objects = new StaticObject[sizeMapX*2][sizeMapY*2][4];
 
 		//int quadran = 1;
 		for (int x = 0; x < sizeMapX; x++) {
 			for (int y = 0; y < sizeMapY; y++) {
 				for (int q = 0; q < 4; q++) {
 					if(!dataObjects[x][y][q].equals("00")){
-						objects[x][y][q] = new Object(atlasObjects.findRegion(dataObjects[x][y][q]));
+						objects[x][y][q] = new StaticObject(atlasObjects.findRegion(dataObjects[x][y][q]));
 						switch (q) {
 						case 0:
 							objects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() / 2, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.75f);
@@ -227,6 +241,12 @@ public class Isometric {
 				
 			}
 		}
+	}
+	
+	public void addDynamicObject(FileHandle file, Vector2 pos){
+		//dynamicObject = new DynamicObject(file);
+		dynamicObject = new DynamicObject(new TextureAtlas(file).findRegion("01"));
+		dynamicObject.setPosition(tiles[(int)pos.x][(int)pos.y].getX(), tiles[(int)pos.x][(int)pos.y].getY());
 	}
 	
 	public void setPosition(Vector2 position) {

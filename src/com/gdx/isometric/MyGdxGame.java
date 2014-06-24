@@ -24,16 +24,15 @@ public class MyGdxGame implements ApplicationListener {
 	public void create() {		
 		
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		camera.position.x = Gdx.graphics.getWidth()/2;
-		camera.position.y = Gdx.graphics.getHeight()/2;
 		batch = new SpriteBatch();
 		
 		isometric = new Isometric(Gdx.files.internal("tiles_2/tiles.pack"), Gdx.files.internal("tiles_2/map.txt"), 6, 5);
-		isometric.addObject(Gdx.files.internal("objects/trees.pack"), Gdx.files.internal("objects/map.txt"));
-		isometric2 = new Isometric(Gdx.files.internal("tiles_2/tiles.pack"), Gdx.files.internal("tiles_2/map.txt"), 6, 5);
-		isometric2.addObject(Gdx.files.internal("objects/trees.pack"), Gdx.files.internal("objects/map.txt"));
+		isometric.addStaticObject(Gdx.files.internal("objects/trees.pack"), Gdx.files.internal("objects/map.txt"));
+		isometric.addDynamicObject(Gdx.files.internal("car/car.pack"), new Vector2(0,3));
 		pos = new Vector2(0,0);
-		pos2 = new Vector2(isometric.getWidth(),isometric.getHeight());
+		
+		camera.position.x = isometric.getPosition().x + isometric.getWidth() / 2;
+		camera.position.y = isometric.getPosition().y + isometric.getHeight() / 2;
 
 	}
 
@@ -62,10 +61,6 @@ public class MyGdxGame implements ApplicationListener {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();		
 		isometric.draw(batch);
-		isometric2.draw(batch);
-
-		isometric.setPosition(pos);
-		isometric2.setPosition(pos2);
 		batch.end();
 		
 

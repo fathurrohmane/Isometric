@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 
-public class Tile extends Sprite{
+public class Tile extends IsometricObject{
 	
 	private String tileName;
 	private Vector2 tilePosOnMap;
