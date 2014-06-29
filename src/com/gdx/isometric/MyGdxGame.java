@@ -27,9 +27,7 @@ public class MyGdxGame implements ApplicationListener {
 		
 		isometric = new Isometric(Gdx.files.internal("tiles_2/tiles.pack"), Gdx.files.internal("tiles_2/map.txt"), 6, 5, 15);
 		isometric.addStaticObject(Gdx.files.internal("objects/trees.pack"), Gdx.files.internal("objects/map.txt"));
-		isometric.addDynamicObject(Gdx.files.internal("car/car.pack"), new Vector2(3,2));
-		
-		isometric.isoTo2D(3, 2);
+		isometric.addDynamicObject(Gdx.files.internal("car/car.pack"), new Vector2(3,3));
 		
 		pos = new Vector2(0,0);
 		

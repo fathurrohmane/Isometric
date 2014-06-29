@@ -12,7 +12,7 @@ public class Tile extends IsometricObject{
 	private String tileName;
 	private Vector2 tilePosOnMap;
 	private BitmapFont coordinateText;
-	private Boolean walkable;
+	private Boolean walkable = true;
 	
 	public Tile(TextureRegion textureRegion){
 		super(textureRegion);
@@ -34,5 +34,14 @@ public class Tile extends IsometricObject{
 	public void draw(SpriteBatch spriteBatch) {
 		super.draw(spriteBatch);
 		//coordinateText.draw(spriteBatch, tilePosOnMap.x+","+tilePosOnMap.y, this.getX(), this.getY());
+		coordinateText.draw(spriteBatch, this.getX()+","+this.getY(), this.getX(), this.getY());
+	}
+	
+	public void setWalkable(Boolean walkable) {
+		this.walkable = walkable;
+	}
+	
+	public Boolean getWalkable() {
+		return walkable;
 	}
 }

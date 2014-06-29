@@ -15,9 +15,11 @@ public class DynamicObject extends IsometricObject{
 	private TextureAtlas textureAtlas;
 	private Animation animation;
 	private TextureRegion[][] textureRegion;
+	private Orientation orientation;
 	
 	public DynamicObject(FileHandle file) {
 		textureAtlas = new TextureAtlas(file);
+		orientation = Orientation.NORTH;
 //		animation = new Animation(1/15f, textureAtlas.getRegions());
 //		textureRegion = new TextureRegion[4][1];
 //		textureRegion[0][0] = textureAtlas.findRegion("01");
@@ -28,10 +30,32 @@ public class DynamicObject extends IsometricObject{
 	
 	public DynamicObject(TextureRegion textureRegion) {
 		super(textureRegion);
+		orientation = Orientation.NORTH;
 	}
 	
 	public DynamicObject(Texture texture){
 		super(texture);
+		orientation = Orientation.NORTH;
+	}
+	
+	public void geser(){
+		this.setPosition(this.getX()-0.1f, this.getY()-(0.1f/2));
+	}
+	
+	public boolean cekX(int xLeft, int xRight){
+		if(getX() >= xLeft && getX() < xRight){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public boolean cekY(int yTop, int yBottom){
+		if(getY() <= yTop && getY() > yBottom){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 	@Override
@@ -39,13 +63,21 @@ public class DynamicObject extends IsometricObject{
 		super.draw(spriteBatch);
 		//Control
 		if(Gdx.input.isKeyPressed(Keys.DOWN)){
-			this.setPosition(this.getX()-0.1f, this.getY()-(0.1f/2));
+			orientation = Orientation.SOUTH;
+			//this.setPosition(this.getX()-0.1f, this.getY()-(0.1f/2));
 		}else if(Gdx.input.isKeyPressed(Keys.UP)){
-			this.setPosition(this.getX()+0.1f, this.getY()+(0.1f/2));
+			orientation = Orientation.NORTH;
+			//this.setPosition(this.getX()+0.1f, this.getY()+(0.1f/2));
 		}else if(Gdx.input.isKeyPressed(Keys.RIGHT)){
-			this.setPosition(this.getX()+0.1f, this.getY()-(0.1f/2));
+			orientation = Orientation.EAST;
+			//this.setPosition(this.getX()+0.1f, this.getY()-(0.1f/2));
 		}else if(Gdx.input.isKeyPressed(Keys.LEFT)){
-			this.setPosition(this.getX()-0.1f, this.getY()+(0.1f/2));
+			orientation = Orientation.WEST;
+			//this.setPosition(this.getX()-0.1f, this.getY()+(0.1f/2));
 		}
 	}
+	
+	public Orientation getOrientation() {
+		return orientation;
+	};
 }

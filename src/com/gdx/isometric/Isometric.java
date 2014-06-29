@@ -40,6 +40,7 @@ public class Isometric {
 		position = new Vector2(0, 0);
 		setWidth();
 		setHeight();
+		setCollusionTiles();
 	}
 
 	private void readDataTiles(FileHandle dataTileFile) {
@@ -111,9 +112,6 @@ public class Isometric {
 		System.out.println("IsoTO2D :"+x+","+y+" -> "+tempPos.x+","+tempPos.y);
 		System.out.println("Dynamic :"+dynamicObject.getX()+","+dynamicObject.getY());
 		return tempPos;
-//		map.x = (screen.x / TILE_WIDTH_HALF + screen.y / TILE_HEIGHT_HALF) / 2;
-//		map.y = (screen.y / TILE_HEIGHT_HALF -(screen.x / TILE_WIDTH_HALF)) / 2;
-		
 	}
 
 	public Vector2 twoDToIso(int x, int y) {
@@ -124,9 +122,6 @@ public class Isometric {
 		System.out.println("Dynamic :"+dynamicObject.getX()+","+dynamicObject.getY());
 		
 		return tempPos;
-//		Basic isometric map to screen is:
-//		screen.x = (map.x - map.y) * TILE_WIDTH_HALF;
-//		screen.y = (map.x + map.y) * TILE_HEIGHT_HALF;
 	}
 
 	public void draw(SpriteBatch batch) {
@@ -139,6 +134,29 @@ public class Isometric {
 					}
 				}
 				if(dynamicObject != null){
+					switch(dynamicObject.getOrientation()){
+					case NORTH:
+						if(cekCollusion(dynamicObject)){
+							dynamicObject.setPosition(dynamicObject.getX() + 0.1f, dynamicObject.getY() + (0.1f/2));
+						}
+						break;
+					case WEST:
+						if(cekCollusion(dynamicObject)){
+							dynamicObject.setPosition(dynamicObject.getX() - 0.1f, dynamicObject.getY() + (0.1f/2));
+						}
+						break;
+					case EAST:
+						if(cekCollusion(dynamicObject)){
+							dynamicObject.setPosition(dynamicObject.getX() + 0.1f, dynamicObject.getY() - (0.1f/2));
+						}
+						break;
+					case SOUTH:
+						if(cekCollusion(dynamicObject)){
+							dynamicObject.setPosition(dynamicObject.getX() - 0.1f, dynamicObject.getY() - (0.1f/2));
+						}
+						break;
+					}
+					//getObjectCoordinate(dynamicObject.getX(),dynamicObject.getY());
 					dynamicObject.draw(batch);
 				}
 			}
@@ -253,6 +271,7 @@ public class Isometric {
 		//dynamicObject = new DynamicObject(file);
 		dynamicObject = new DynamicObject(new TextureAtlas(file).findRegion("01"));
 		dynamicObject.setPosition(tiles[(int)pos.x][(int)pos.y].getX(), tiles[(int)pos.x][(int)pos.y].getY());
+		//getObjectCoordinate(tiles[(int)pos.x][(int)pos.y].getX(), tiles[(int)pos.x][(int)pos.y].getY());
 	}
 	
 	public void setPosition(Vector2 position) {
@@ -305,12 +324,88 @@ public class Isometric {
 	
 	private void setHeight() {
 		this.height = sizeMapY*tiles[0][0].getHeight() / 2;
+	}	
+
+	public DynamicObject getDynamicObject() {
+		return dynamicObject;
+	};
+	//NEED TO EDIT...
+	public Vector2 getObjectCoordinate(float x, float y){
+		Vector2 result = new Vector2();
+		x = (float) Math.ceil(x);
+		y = (float) Math.ceil(y);
+		result.x = (float) Math.ceil((x / (tiles[0][0].getWidth() / 2) - y / (tiles[0][0].getHeight() / 2)) / 2);
+		result.y = (float) Math.floor((y / (tiles[0][0].getHeight() / 2) + (x / (tiles[0][0].getWidth() / 2))) / 2);
+		System.out.println(x+","+y+"->"+result.x+","+result.y);
+		return result;
 	}
 	
-	public void isColliding(IsometricObject object){
-		//int row1 = object.
+	public boolean cekCollusion(DynamicObject object){
+		Boolean output = false;
+		Vector2 posObjectOnTile = getObjectCoordinate(object.getX(), object.getY());
+		
+		switch (object.getOrientation()) {
+		case NORTH:
+				if(tiles[(int)posObjectOnTile.x][(int)posObjectOnTile.y+1].getWalkable()){
+					output = true;
+				}else{
+					output = false;
+				}
+			break;
+		case WEST:
+			if(tiles[(int)posObjectOnTile.x-1][(int)posObjectOnTile.y].getWalkable()){
+				output = true;
+			}else{
+				output = false;
+			}
+			break;
+		case EAST:
+			if(tiles[(int)posObjectOnTile.x+1][(int)posObjectOnTile.y].getWalkable()){
+				output = true;
+			}else{
+				output = false;
+			}
+			break;
+		case SOUTH:
+			if(tiles[(int)posObjectOnTile.x][(int)posObjectOnTile.y-1].getWalkable()){
+				output = true;
+			}else{
+				output = false;
+			}
+			break;
+		}
+		
+		return output;
 	}
 	
-	
+	private void setCollusionTiles(){
+		tiles[0][0].setWalkable(false);
+		tiles[0][1].setWalkable(false);
+		tiles[0][2].setWalkable(false);
+		tiles[0][3].setWalkable(false);
+		tiles[0][4].setWalkable(false);
+		
+		tiles[0][0].setWalkable(false);
+		tiles[1][0].setWalkable(false);
+		tiles[2][0].setWalkable(false);
+		tiles[3][0].setWalkable(false);
+		tiles[4][0].setWalkable(false);
+		tiles[5][0].setWalkable(false);
+		
+		tiles[5][0].setWalkable(false);
+		tiles[5][1].setWalkable(false);
+		tiles[5][2].setWalkable(false);
+		tiles[5][3].setWalkable(false);
+		tiles[5][4].setWalkable(false);
+		
+		tiles[0][4].setWalkable(false);
+		tiles[1][4].setWalkable(false);
+		tiles[2][4].setWalkable(false);
+		tiles[3][4].setWalkable(false);
+		tiles[4][4].setWalkable(false);
+		tiles[5][4].setWalkable(false);
+		
+		
+	}
 }
 //http://clintbellanger.net/articles/isometric_math/
