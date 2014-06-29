@@ -14,24 +14,26 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 public class Isometric {
 
 	private TextureAtlas atlasTiles;
-	private TextureAtlas atlasObjects;
+	private TextureAtlas atlasStaticObjects;
 	private String[][] dataTiles;
-	private String[][][] dataObjects;
+	private String[][][] dataStaticObjects;
 	private int sizeMapX, sizeMapY;
 	private Tile[][] tiles;
-	private StaticObject[][][] objects;
+	private StaticObject[][][] staticObjects;
 	
 	public Vector2 position;
 	public float width;
 	public float height;
+	private float tileHeight;
 	
 	private DynamicObject dynamicObject;
 
 	// Create new Isometric | Input tile isometic and map
 	public Isometric(FileHandle tileFile, FileHandle dataMapFile, int sizeMapX,
-			int sizeMapY) {
+			int sizeMapY, float tileHight) {
 		this.sizeMapX = sizeMapX;
 		this.sizeMapY = sizeMapY;
+		this.tileHeight = tileHight;
 		atlasTiles = new TextureAtlas(tileFile);
 		readDataTiles(dataMapFile);
 		createTiles();
@@ -96,7 +98,7 @@ public class Isometric {
 				tiles[x][y].setTileName(dataTiles[x][y]);
 				tiles[x][y].setPosition(
 						(x + y) * tiles[x][y].getWidth() / 2,
-						(y - x) * (tiles[x][y].getHeight() - 15) / 2);//NEED EDIT
+						(y - x) * (tiles[x][y].getHeight() - tileHeight) / 2);
 				tiles[x][y].setTilePos(new Vector2(x, y));
 			}
 		}
@@ -104,8 +106,10 @@ public class Isometric {
 	//need to edit
 	public Vector2 isoTo2D(int x, int y) {
 		Vector2 tempPos = new Vector2(0, 0);
-		tempPos.x = (y / tiles[x][y].getHeight() / 2) - (x / tiles[x][y].getWidth() / 2);
-		tempPos.y = (y / tiles[x][y].getHeight() / 2) + (x / tiles[x][y].getWidth() / 2);
+		tempPos.x = (x / tiles[x][y].getWidth() / 2) + (y / tiles[x][y].getHeight() / 2);
+		tempPos.y = (y / tiles[x][y].getHeight() / 2) - (x / tiles[x][y].getWidth() / 2);
+		System.out.println("IsoTO2D :"+x+","+y+" -> "+tempPos.x+","+tempPos.y);
+		System.out.println("Dynamic :"+dynamicObject.getX()+","+dynamicObject.getY());
 		return tempPos;
 //		map.x = (screen.x / TILE_WIDTH_HALF + screen.y / TILE_HEIGHT_HALF) / 2;
 //		map.y = (screen.y / TILE_HEIGHT_HALF -(screen.x / TILE_WIDTH_HALF)) / 2;
@@ -115,7 +119,10 @@ public class Isometric {
 	public Vector2 twoDToIso(int x, int y) {
 		Vector2 tempPos = new Vector2(0, 0);
 		tempPos.x = (x + y) * tiles[x][y].getWidth() / 2;
-		tempPos.y = (y - x) * (tiles[x][y].getHeight() - 15) / 2;//NEED EDIT
+		tempPos.y = (y - x) * (tiles[x][y].getHeight() - tileHeight) / 2;
+		System.out.println("TwoDToIdo :"+x+","+y+" -> "+tempPos.x+","+tempPos.y);
+		System.out.println("Dynamic :"+dynamicObject.getX()+","+dynamicObject.getY());
+		
 		return tempPos;
 //		Basic isometric map to screen is:
 //		screen.x = (map.x - map.y) * TILE_WIDTH_HALF;
@@ -127,8 +134,8 @@ public class Isometric {
 			for (int y = sizeMapY - 1; y >= 0; y--) {
 				tiles[x][y].draw(batch);
 				for (int q = 0; q < 4; q++) {
-					if(objects[x][y][q] != null){
-						objects[x][y][q].draw(batch);
+					if(staticObjects[x][y][q] != null){
+						staticObjects[x][y][q].draw(batch);
 					}
 				}
 				if(dynamicObject != null){
@@ -139,7 +146,7 @@ public class Isometric {
 	}
 	
 	public void addStaticObject(FileHandle objectFile, FileHandle dataMapFile){
-		atlasObjects = new TextureAtlas(objectFile);
+		atlasStaticObjects = new TextureAtlas(objectFile);
 		readDataObject(dataMapFile);
 	}
 	
@@ -147,7 +154,7 @@ public class Isometric {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				dataObjectFile.read()));
 		try {
-			dataObjects = new String[sizeMapX][sizeMapY][4];
+			dataStaticObjects = new String[sizeMapX][sizeMapY][4];
 			String[] lines = new String[sizeMapY*2];
 			int counterLines = 0;
 			// split map data per line
@@ -176,9 +183,8 @@ public class Isometric {
 				//System.out.println(line);
 				for (int y = 0; y < line.length(); y++) {// loop for y axis
 					if (y % 2 == 0 && counterX != sizeMapX*2) {
-						dataObjects[counterX][counterY][quadran] = line.charAt(y) + ""
+						dataStaticObjects[counterX][counterY][quadran] = line.charAt(y) + ""
 								+ line.charAt(y + 1);
-						System.out.println(line.charAt(y) + "" + line.charAt(y + 1));
 						if(quadran == 1){
 							quadran = 2;
 						}else if(quadran == 2){
@@ -209,33 +215,33 @@ public class Isometric {
 	}
 	
 	private void createObjects() {
-		objects = new StaticObject[sizeMapX*2][sizeMapY*2][4];
+		staticObjects = new StaticObject[sizeMapX*2][sizeMapY*2][4];
 
 		//int quadran = 1;
 		for (int x = 0; x < sizeMapX; x++) {
 			for (int y = 0; y < sizeMapY; y++) {
 				for (int q = 0; q < 4; q++) {
-					if(!dataObjects[x][y][q].equals("00")){
-						objects[x][y][q] = new StaticObject(atlasObjects.findRegion(dataObjects[x][y][q]));
+					if(!dataStaticObjects[x][y][q].equals("00")){
+						staticObjects[x][y][q] = new StaticObject(atlasStaticObjects.findRegion(dataStaticObjects[x][y][q]));
 						switch (q) {
 						case 0:
-							objects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() / 2, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.75f);
+							staticObjects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() / 2, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.75f);
 							break;
 						case 1:
-							objects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() * 0.25f, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.5f);
+							staticObjects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() * 0.25f, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.5f);
 							break;
 						case 2:
-							objects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() / 2, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.25f);
+							staticObjects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() / 2, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.25f);
 							break;
 						case 3:
-							objects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() * 0.75f,tiles[x][y].getY() + tiles[x][y].getHeight() / 2);
+							staticObjects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() * 0.75f,tiles[x][y].getY() + tiles[x][y].getHeight() / 2);
 							break;
 
 						default:
 							break;
 						}
 					}else{
-						objects[x][y][q] = null;
+						staticObjects[x][y][q] = null;
 					}
 				}
 				
@@ -257,19 +263,19 @@ public class Isometric {
 						position.y + (y - x) * (tiles[x][y].getHeight() - 15) / 2);//NEED EDIT
 				tiles[x][y].setTilePos(new Vector2(x, y));
 				for (int q = 0; q < 4; q++) {
-					if(objects[x][y][q] != null){
+					if(staticObjects[x][y][q] != null){
 						switch (q) {
 						case 0:
-							objects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() / 2, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.75f);
+							staticObjects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() / 2, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.75f);
 							break;
 						case 1:
-							objects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() * 0.25f, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.5f);
+							staticObjects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() * 0.25f, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.5f);
 							break;
 						case 2:
-							objects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() / 2, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.25f);
+							staticObjects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() / 2, tiles[x][y].getY() + tiles[x][y].getHeight() * 0.25f);
 							break;
 						case 3:
-							objects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() * 0.75f,tiles[x][y].getY() + tiles[x][y].getHeight() / 2);
+							staticObjects[x][y][q].setPosition(tiles[x][y].getX() + tiles[x][y].getWidth() * 0.75f,tiles[x][y].getY() + tiles[x][y].getHeight() / 2);
 							break;
 
 						default:
@@ -300,5 +306,11 @@ public class Isometric {
 	private void setHeight() {
 		this.height = sizeMapY*tiles[0][0].getHeight() / 2;
 	}
+	
+	public void isColliding(IsometricObject object){
+		//int row1 = object.
+	}
+	
+	
 }
 //http://clintbellanger.net/articles/isometric_math/

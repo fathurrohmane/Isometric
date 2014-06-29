@@ -12,6 +12,7 @@ public class Tile extends IsometricObject{
 	private String tileName;
 	private Vector2 tilePosOnMap;
 	private BitmapFont coordinateText;
+	private Boolean walkable;
 	
 	public Tile(TextureRegion textureRegion){
 		super(textureRegion);

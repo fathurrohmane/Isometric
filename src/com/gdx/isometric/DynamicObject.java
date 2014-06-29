@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 
 public class DynamicObject extends IsometricObject{
 
@@ -19,7 +18,6 @@ public class DynamicObject extends IsometricObject{
 	
 	public DynamicObject(FileHandle file) {
 		textureAtlas = new TextureAtlas(file);
-
 //		animation = new Animation(1/15f, textureAtlas.getRegions());
 //		textureRegion = new TextureRegion[4][1];
 //		textureRegion[0][0] = textureAtlas.findRegion("01");
@@ -39,19 +37,15 @@ public class DynamicObject extends IsometricObject{
 	@Override
 	public void draw(SpriteBatch spriteBatch) {
 		super.draw(spriteBatch);
-		control(spriteBatch);
-		
-	}
-	
-	public void control(SpriteBatch batch){
+		//Control
 		if(Gdx.input.isKeyPressed(Keys.DOWN)){
 			this.setPosition(this.getX()-0.1f, this.getY()-(0.1f/2));
 		}else if(Gdx.input.isKeyPressed(Keys.UP)){
 			this.setPosition(this.getX()+0.1f, this.getY()+(0.1f/2));
 		}else if(Gdx.input.isKeyPressed(Keys.RIGHT)){
-			this.setPosition(this.getX()+(0.1f), this.getY()-(0.1f/2));
+			this.setPosition(this.getX()+0.1f, this.getY()-(0.1f/2));
 		}else if(Gdx.input.isKeyPressed(Keys.LEFT)){
-			this.setPosition(this.getX()-(0.1f), this.getY()+(0.1f/2));
+			this.setPosition(this.getX()-0.1f, this.getY()+(0.1f/2));
 		}
 	}
 }

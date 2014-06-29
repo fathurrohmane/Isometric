@@ -16,9 +16,8 @@ public class MyGdxGame implements ApplicationListener {
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private Isometric isometric;
-	private Isometric isometric2;
+
 	private Vector2 pos;
-	private Vector2 pos2;
 	
 	@Override
 	public void create() {		
@@ -26,9 +25,12 @@ public class MyGdxGame implements ApplicationListener {
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch = new SpriteBatch();
 		
-		isometric = new Isometric(Gdx.files.internal("tiles_2/tiles.pack"), Gdx.files.internal("tiles_2/map.txt"), 6, 5);
+		isometric = new Isometric(Gdx.files.internal("tiles_2/tiles.pack"), Gdx.files.internal("tiles_2/map.txt"), 6, 5, 15);
 		isometric.addStaticObject(Gdx.files.internal("objects/trees.pack"), Gdx.files.internal("objects/map.txt"));
-		isometric.addDynamicObject(Gdx.files.internal("car/car.pack"), new Vector2(0,3));
+		isometric.addDynamicObject(Gdx.files.internal("car/car.pack"), new Vector2(3,2));
+		
+		isometric.isoTo2D(3, 2);
+		
 		pos = new Vector2(0,0);
 		
 		camera.position.x = isometric.getPosition().x + isometric.getWidth() / 2;
