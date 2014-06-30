@@ -34,7 +34,7 @@ public class Tile extends IsometricObject{
 	public void draw(SpriteBatch spriteBatch) {
 		super.draw(spriteBatch);
 		//coordinateText.draw(spriteBatch, tilePosOnMap.x+","+tilePosOnMap.y, this.getX(), this.getY());
-		coordinateText.draw(spriteBatch, this.getX()+","+this.getY(), this.getX(), this.getY());
+		//coordinateText.draw(spriteBatch, this.getX()+","+this.getY(), this.getX(), this.getY());
 	}
 	
 	public void setWalkable(Boolean walkable) {
@@ -44,4 +44,5 @@ public class Tile extends IsometricObject{
 	public Boolean getWalkable() {
 		return walkable;
 	}
+	
 }

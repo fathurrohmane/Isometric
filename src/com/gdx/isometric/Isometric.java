@@ -134,29 +134,29 @@ public class Isometric {
 					}
 				}
 				if(dynamicObject != null){
-					switch(dynamicObject.getOrientation()){
-					case NORTH:
-						if(cekCollusion(dynamicObject)){
-							dynamicObject.setPosition(dynamicObject.getX() + 0.1f, dynamicObject.getY() + (0.1f/2));
-						}
-						break;
-					case WEST:
-						if(cekCollusion(dynamicObject)){
-							dynamicObject.setPosition(dynamicObject.getX() - 0.1f, dynamicObject.getY() + (0.1f/2));
-						}
-						break;
-					case EAST:
-						if(cekCollusion(dynamicObject)){
-							dynamicObject.setPosition(dynamicObject.getX() + 0.1f, dynamicObject.getY() - (0.1f/2));
-						}
-						break;
-					case SOUTH:
-						if(cekCollusion(dynamicObject)){
-							dynamicObject.setPosition(dynamicObject.getX() - 0.1f, dynamicObject.getY() - (0.1f/2));
-						}
-						break;
-					}
-					//getObjectCoordinate(dynamicObject.getX(),dynamicObject.getY());
+					//getObjectCoordinate(dynamicObject.getX(), dynamicObject.getY());
+//					switch(dynamicObject.getOrientation()){
+//					case NORTH:
+//						if(!cekCollusion(dynamicObject)){
+//							dynamicObject.setPosition(dynamicObject.getX() + 0.01f, dynamicObject.getY() + (0.01f/2));
+//						}
+//						break;
+//					case WEST:
+//						if(!cekCollusion(dynamicObject)){
+//							dynamicObject.setPosition(dynamicObject.getX() - 0.01f, dynamicObject.getY() + (0.01f/2));
+//						}
+//						break;
+//					case EAST:
+//						if(!cekCollusion(dynamicObject)){
+//							dynamicObject.setPosition(dynamicObject.getX() + 0.01f, dynamicObject.getY() - (0.01f/2));
+//						}
+//						break;
+//					case SOUTH:
+//						if(!cekCollusion(dynamicObject)){
+//							dynamicObject.setPosition(dynamicObject.getX() - 0.01f, dynamicObject.getY() - (0.01f/2));
+//						}
+//						break;
+//					}
 					dynamicObject.draw(batch);
 				}
 			}
@@ -271,7 +271,7 @@ public class Isometric {
 		//dynamicObject = new DynamicObject(file);
 		dynamicObject = new DynamicObject(new TextureAtlas(file).findRegion("01"));
 		dynamicObject.setPosition(tiles[(int)pos.x][(int)pos.y].getX(), tiles[(int)pos.x][(int)pos.y].getY());
-		//getObjectCoordinate(tiles[(int)pos.x][(int)pos.y].getX(), tiles[(int)pos.x][(int)pos.y].getY());
+		
 	}
 	
 	public void setPosition(Vector2 position) {
@@ -325,16 +325,17 @@ public class Isometric {
 	private void setHeight() {
 		this.height = sizeMapY*tiles[0][0].getHeight() / 2;
 	}	
-
+	
 	public DynamicObject getDynamicObject() {
 		return dynamicObject;
 	};
+	
 	//NEED TO EDIT...
 	public Vector2 getObjectCoordinate(float x, float y){
 		Vector2 result = new Vector2();
-		x = (float) Math.ceil(x);
-		y = (float) Math.ceil(y);
-		result.x = (float) Math.ceil((x / (tiles[0][0].getWidth() / 2) - y / (tiles[0][0].getHeight() / 2)) / 2);
+		x = Math.round(x);
+		y = Math.round(y);
+		result.x = (float) Math.floor((x / (tiles[0][0].getWidth() / 2) - y / (tiles[0][0].getHeight() / 2)) / 2);
 		result.y = (float) Math.floor((y / (tiles[0][0].getHeight() / 2) + (x / (tiles[0][0].getWidth() / 2))) / 2);
 		System.out.println(x+","+y+"->"+result.x+","+result.y);
 		return result;
@@ -342,35 +343,35 @@ public class Isometric {
 	
 	public boolean cekCollusion(DynamicObject object){
 		Boolean output = false;
-		Vector2 posObjectOnTile = getObjectCoordinate(object.getX(), object.getY());
+		Vector2 posObjectOnTile = getObjectCoordinate(object.getX() - object.getWidth() / 2, object.getY() - object.getHeight() / 2);
 		
 		switch (object.getOrientation()) {
 		case NORTH:
 				if(tiles[(int)posObjectOnTile.x][(int)posObjectOnTile.y+1].getWalkable()){
-					output = true;
-				}else{
 					output = false;
+				}else{
+					output = true;
 				}
 			break;
 		case WEST:
 			if(tiles[(int)posObjectOnTile.x-1][(int)posObjectOnTile.y].getWalkable()){
-				output = true;
-			}else{
 				output = false;
+			}else{
+				output = true;
 			}
 			break;
 		case EAST:
 			if(tiles[(int)posObjectOnTile.x+1][(int)posObjectOnTile.y].getWalkable()){
-				output = true;
-			}else{
 				output = false;
+			}else{
+				output = true;
 			}
 			break;
 		case SOUTH:
 			if(tiles[(int)posObjectOnTile.x][(int)posObjectOnTile.y-1].getWalkable()){
-				output = true;
-			}else{
 				output = false;
+			}else{
+				output = true;
 			}
 			break;
 		}

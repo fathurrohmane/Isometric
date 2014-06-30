@@ -56,8 +56,10 @@ public class MyGdxGame implements ApplicationListener {
 			camera.position.x++;
 		}
 		
-		camera.update();
+		Vector2 posMouse = isometric.getObjectCoordinate(Gdx.input.getX(), Gdx.input.getY());
+		//System.out.println(Gdx.input.getX()+","+Gdx.input.getY()+"->"+posMouse.x+","+posMouse.y);
 		
+		camera.update();
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();		
 		isometric.draw(batch);
